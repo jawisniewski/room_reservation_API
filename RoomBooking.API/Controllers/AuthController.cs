@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RoomBooking.API.Extensions;
-using RoomBooking.Application.DTOs;
+using RoomBooking.Application.DTOs.Auth;
 using RoomBooking.Application.Interfaces.Services;
 using RoomBooking.Application.Services;
 

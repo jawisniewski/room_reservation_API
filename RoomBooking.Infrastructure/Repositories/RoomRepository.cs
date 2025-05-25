@@ -1,5 +1,7 @@
-﻿using RoomBooking.Domain.Entitis.Room;
-using RoomBooking.Services.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using RoomBooking.Application.DTOs.Room;
+using RoomBooking.Domain.Entitis.Room;
+using RoomBooking.Infrastructure.Configs;
 using RoomBooking.Services.Interfaces.Repositories;
 using RoomsReservation.Domain.Interfaces.Repositories;
 using System;
@@ -12,39 +14,113 @@ namespace RoomBooking.Infrastructure.Repositories
 {
     public class RoomRepository : IRoomRepository, IRoomQueryRepository
     {
-        public Task<int> Create(Room room)
+        private readonly DbSet<Room> _rooms;
+        private readonly AppDbContext _context;
+        public RoomRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _rooms = _context.Set<Room>();
+        }
+        public async Task<Guid> CreateAsync(Room room)
+        {
+            _rooms.Add(room);
+            await _context.SaveChangesAsync();
+
+            return room.Id;
         }
 
-        public Task<int> Delete(Room room)
+        public async Task<bool> DeleteAsync(Guid roomId)
         {
-            throw new NotImplementedException();
+            var room = await _rooms.FirstOrDefaultAsync(r => r.Id == roomId).ConfigureAwait(false);
+
+            if (room == null)
+                return false;
+
+            _rooms.Remove(room);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public Task<IEnumerable<Room>> GetAvailableRooms(DateTime from, DateTime to)
+        public async Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime from, DateTime to, RoomFilters roomFilter)
         {
-            throw new NotImplementedException();
+            var query = _rooms.AsNoTracking().AsQueryable();
+
+            ApplyRoomQueryFilters(roomFilter, ref query);
+            FilterRoomsByAvailability(from, to, ref query);
+
+            return await query
+                .ToListAsync()
+                .ConfigureAwait(false);
+
         }
 
-        public Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime from, DateTime to, RoomFilters roomFilter)
+        public async Task<Room?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _rooms.Include(x=>x.Equipments).AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == id)
+                .ConfigureAwait(false);
         }
 
-        public Task<Room> GetByIdAsync(Guid id)
+        public async Task<Room?> GetByNameAsync(string name)
         {
-            throw new NotImplementedException();
+            return await _rooms.AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Name == name)
+                .ConfigureAwait(false);
         }
 
-        public Task<bool> IsAvailableAsync(Guid room, DateTime from, DateTime to, Guid? excludedReservationId = null)
+        public async Task<bool> IsAvailableAsync(Guid room, DateTime from, DateTime to, Guid? excludedReservationId = null)
         {
-            throw new NotImplementedException();
+            var query = _rooms.AsNoTracking()
+                .Where(r => r.Id == room)
+                .Include(r => r.Reservations)
+                .AsQueryable();
+
+            ExcludeReservationFromQuery(excludedReservationId, ref query);
+            FilterRoomsByAvailability(from, to, ref query);
+
+            return await query.AnyAsync();
         }
 
-        public Task<int> Update(Room room)
+        public async Task<bool> UpdateAsync(Room room)
         {
-            throw new NotImplementedException();
+            _rooms.Update(room);
+
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return true;
         }
+
+        private void FilterRoomsByAvailability(DateTime from, DateTime to, ref IQueryable<Room> roomQuery)
+        {
+            roomQuery = roomQuery.Where(r => !r.Reservations.Any(reservation =>
+                (reservation.From < to && reservation.To > from)));
+        }
+
+        private void ApplyRoomQueryFilters(RoomFilters roomFilter, ref IQueryable<Room> roomsQuery)
+        {
+            if (roomFilter == null)
+                return;
+
+            if (roomFilter.Capacity != null)
+                roomsQuery = roomsQuery.Where(r => r.Capacity >= roomFilter.Capacity);
+            if (roomFilter.Name != null)
+                roomsQuery = roomsQuery.Where(r => r.Name.ToLower().Contains(roomFilter.Name.ToLower()));
+            if (roomFilter.TableCount != null)
+                roomsQuery = roomsQuery.Where(r => r.TableCount >= roomFilter.TableCount);
+            if (roomFilter.Layout != null)
+                roomsQuery = roomsQuery.Where(r => r.Layout == roomFilter.Layout);
+            if (roomFilter.Equipments != null)
+                roomsQuery = roomsQuery.Where(r => r.Equipments.All(e => roomFilter.Equipments.Any(rfe => rfe.Name == e.Type.Name)));
+        }
+
+        private void ExcludeReservationFromQuery(Guid? excludedReservationId, ref IQueryable<Room> query)
+        {
+            if (excludedReservationId.HasValue)
+            {
+                query = query.Where(r => !r.Reservations.Any(reservation => reservation.Id == excludedReservationId.Value));
+            }
+        }
+
     }
 }

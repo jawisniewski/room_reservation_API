@@ -21,30 +21,46 @@ namespace RoomBooking.Domain.Entitis.Room
         public virtual RoomReservationLimit? ReservationLimit { get; private set; }
         public  IEnumerable<Equipment> Equipments { get; private set; }
         private Room() { }
-        private Room(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments)
+        private Room(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments, RoomReservationLimit reservationLimit)
         {
             Name = name;
             Capacity = capacity;
             TableCount = tableCount;
             Layout = roomLayout;
             Equipments = equipments;
+            ReservationLimit = reservationLimit;
         }
 
-        public static Room Create(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments)
+        public static Room Create(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments, RoomReservationLimit? reservationLimit)
         {
             Validate(name, capacity, tableCount, roomLayout, equipments);
 
-            return new Room(name, capacity, tableCount, roomLayout, equipments);
+            return new Room(name, capacity, tableCount, roomLayout, equipments, reservationLimit);
         }
 
+        public void Update(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments, RoomReservationLimit? reservationLimit)
+        {
+            if(Id == Guid.Empty)
+                throw new DomainException("Room ID cannot be empty. Ensure the room is properly initialized.");
+            
+            Validate(name, capacity, tableCount, roomLayout, equipments);
+
+            Name = name.Trim(); 
+            Capacity = capacity;
+            TableCount = tableCount;
+            Layout = roomLayout;
+            Equipments = equipments;
+            ReservationLimit = reservationLimit;
+
+        }
         private static void Validate(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Room name cannot be empty", nameof(name));
+                throw new DomainException("Room name cannot be empty");
             if (capacity <= 0)
-                throw new ArgumentException("Capacity must be positive", nameof(capacity));
+                throw new DomainException("Capacity must be positive");
             if (tableCount < 0)
-                throw new ArgumentException("Table count cannot be negative", nameof(tableCount));
+                throw new DomainException("Table count cannot be negative");
 
             ValidateLayout(roomLayout, tableCount, capacity);
             ValidateEquipments(equipments);
@@ -74,8 +90,8 @@ namespace RoomBooking.Domain.Entitis.Room
             if (equipments == null || !equipments.Any())
                 throw new DomainException("At least one equipment is required.");
 
-            if (equipments.Any(x => x.Name == EquipmentType.Videoconferencing) &&
-                !(equipments.Any(x => x.Name == EquipmentType.Projector || x.Name == EquipmentType.Screen)))
+            if (equipments.Any(x => x.Type == EquipmentType.Videoconferencing) &&
+                !(equipments.Any(x => x.Type == EquipmentType.Projector || x.Type == EquipmentType.Screen)))
             {
                 throw new DomainException("Videoconferencing set requires projector or screen.");
             }

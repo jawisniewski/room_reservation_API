@@ -1,4 +1,6 @@
 ﻿using RoomBooking.Domain.Common;
+using RoomBooking.Domain.DI;
+using RoomBooking.Domain.Exceptions;
 
 namespace RoomBooking.Domain.ValueObjects
 {
@@ -17,6 +19,20 @@ namespace RoomBooking.Domain.ValueObjects
         {
             Name = name;
         }
+
+        public static EquipmentType FromName(string name)
+        {
+            return name.ToLower().Trim() switch
+            {
+                "projector" => Projector,
+                "whiteboard" => Whiteboard,
+                "videoconferencing" => Videoconferencing,
+                "screen" => Screen,
+                _ => throw new DomainException($"Unknown equipment type")
+
+            };
+        }
+
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Name;

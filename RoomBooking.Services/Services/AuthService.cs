@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RoomBooking.Application.Common;
-using RoomBooking.Application.DTOs;
+using RoomBooking.Application.DTOs.Auth;
 using RoomBooking.Application.Interfaces;
 using RoomBooking.Application.Interfaces.Services;
 using RoomBooking.Services.Interfaces.Repositories;

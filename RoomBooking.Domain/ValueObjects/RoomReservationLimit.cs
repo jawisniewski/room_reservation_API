@@ -26,13 +26,13 @@ namespace RoomBooking.Domain.ValueObjects
         private void Validate(int minTime, int maxTime)
         {
             if (minTime < 0)
-                throw new DomainException("Minimal reservation time must be positive.");
+                throw new DomainException("Minimum reservation time must be positive.");
 
-            if (maxTime < 0)
-                throw new DomainException("Maximal reservation time must be positive.");
+            if (maxTime <= 0)
+                throw new DomainException("Maximum reservation time must be positive.");
 
-            if (minTime > maxTime)
-                throw new DomainException("Maximal reservation time must be bigger then minimal.");
+            if (minTime >= maxTime)
+                throw new DomainException("Minimum reservation time must be lower then maximum.");
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

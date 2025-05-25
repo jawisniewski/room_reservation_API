@@ -1,5 +1,5 @@
-﻿using RoomBooking.Domain.Entitis.Room;
-using RoomBooking.Services.DTOs;
+﻿using RoomBooking.Application.DTOs.Room;
+using RoomBooking.Domain.Entitis.Room;
 
 namespace RoomBooking.Services.Interfaces.Repositories
 {

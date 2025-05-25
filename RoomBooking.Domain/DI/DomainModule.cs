@@ -15,7 +15,7 @@ namespace RoomBooking.Domain.DI
         public static IServiceCollection AddDomain(this IServiceCollection services)
         {
             services.AddScoped<IRoomReservationService, RoomReservationService>();
-
+            services.AddScoped<IRoomService, RoomService>();
             return services;
         }
     }

@@ -28,7 +28,7 @@ namespace RoomBooking.Infrastructure.Configs
 
                 r.OwnsMany(r => r.Equipments, eq =>
                     {
-                        eq.OwnsOne(eq => eq.Name);
+                        eq.OwnsOne(eq => eq.Type);
                     });
                 r.OwnsOne(b => b.ReservationLimit);
                 r.Property(r => r.Name)

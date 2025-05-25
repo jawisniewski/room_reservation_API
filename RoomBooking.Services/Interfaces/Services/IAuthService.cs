@@ -1,5 +1,5 @@
 ﻿using RoomBooking.Application.Common;
-using RoomBooking.Application.DTOs;
+using RoomBooking.Application.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;

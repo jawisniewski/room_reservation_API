@@ -1,4 +1,5 @@
 ﻿using RoomBooking.Domain.Entitis.Room;
+using RoomBooking.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,25 +32,25 @@ namespace RoomsReservation.Domain.Entitis
         {
             if (from >= to)
             {
-                throw new ArgumentException("From date must be earlier than To date.");
+                throw new DomainException("From date must be earlier than To date.");
             }
             
             if(from < DateTime.Now)
             {
-                throw new ArgumentException("From date cannot be in the past.");
+                throw new DomainException("From date cannot be in the past.");
             }
 
             if (to < DateTime.Now)
             {
-                throw new ArgumentException("To date cannot be in the past.");
+                throw new DomainException("To date cannot be in the past.");
             }
             if (roomId == Guid.Empty)
             {
-                throw new ArgumentException("Room ID cannot be empty.");
+                throw new DomainException("Room ID cannot be empty.");
             }
             if (userId == Guid.Empty)
             {
-                throw new ArgumentException("User ID cannot be empty.");
+                throw new DomainException("User ID cannot be empty.");
             }
         }
 

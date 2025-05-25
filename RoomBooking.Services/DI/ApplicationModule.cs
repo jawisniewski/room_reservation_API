@@ -14,6 +14,7 @@ namespace RoomBooking.Application.DI
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IRoomAppService, RoomAppService>();
             return services;
         }
     }
