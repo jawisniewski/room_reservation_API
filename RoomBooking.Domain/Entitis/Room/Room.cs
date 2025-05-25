@@ -17,9 +17,9 @@ namespace RoomBooking.Domain.Entitis.Room
         public int Capacity { get; private set; }
         public int TableCount { get; private set; }
         public RoomLayoutEnum Layout { get; private set; }
-        public virtual List<Reservation> Reservations { get; private set; } = [];
-        public virtual RoomReservationLimit? RoomReservationLimit { get; private set; }
-        public virtual List<Equipment> Equipments { get; private set; }
+        public virtual IEnumerable<Reservation> Reservations { get; private set; } = [];
+        public virtual RoomReservationLimit? ReservationLimit { get; private set; }
+        public  IEnumerable<Equipment> Equipments { get; private set; }
         private Room() { }
         private Room(string name, int capacity, int tableCount, RoomLayoutEnum roomLayout, List<Equipment> equipments)
         {
@@ -82,14 +82,14 @@ namespace RoomBooking.Domain.Entitis.Room
         }
         public void IsReservationWithinLimits(DateTime from, DateTime to)
         {
-            if (RoomReservationLimit is null)
+            if (ReservationLimit is null)
                 return;
 
             var reservationDuration = (to - from).TotalMinutes;
 
-            if (reservationDuration < RoomReservationLimit.MinTime || reservationDuration > RoomReservationLimit.MaxTime)
+            if (reservationDuration < ReservationLimit.MinTime || reservationDuration > ReservationLimit.MaxTime)
             {
-                throw new DomainException($"Reservation duration must be between {RoomReservationLimit.MinTime} and {RoomReservationLimit.MaxTime} minutes.");
+                throw new DomainException($"Reservation duration must be between {ReservationLimit.MinTime} and {ReservationLimit.MaxTime} minutes.");
             }
         }
     }
