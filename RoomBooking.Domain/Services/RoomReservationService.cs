@@ -1,5 +1,6 @@
 ﻿using RoomBooking.Domain.Entitis.Room;
 using RoomBooking.Domain.Exceptions;
+using RoomBooking.Domain.Interfaces.Services;
 using RoomsReservation.Domain.Entitis;
 using RoomsReservation.Domain.Interfaces.Repositories;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RoomBooking.Domain.Services
 {
-    public class RoomReservationService
+    public class RoomReservationService : IRoomReservationService
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IRoomRepository _roomRepository;
