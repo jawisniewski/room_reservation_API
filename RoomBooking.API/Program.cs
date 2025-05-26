@@ -31,6 +31,7 @@ builder.Services.ConfigureOptions<JwtBrearerOptionsSetup>();
 builder.Services.AddInfrastracture(connectionString);
 builder.Services.AddApplication();
 builder.Services.AddDomain();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer();

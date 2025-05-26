@@ -75,5 +75,6 @@ namespace RoomsReservation.Domain.Entitis
                 throw new UnauthorizedAccessException("You are not authorized to perform this action on this reservation.");
             }
         }
+    
     }
 }

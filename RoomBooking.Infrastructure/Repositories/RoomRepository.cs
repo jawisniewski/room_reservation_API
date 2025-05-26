@@ -23,7 +23,7 @@ namespace RoomBooking.Infrastructure.Repositories
         }
         public async Task<Guid> CreateAsync(Room room)
         {
-            _rooms.Add(room);
+            await _rooms.AddAsync(room);
             await _context.SaveChangesAsync();
 
             return room.Id;
@@ -47,7 +47,7 @@ namespace RoomBooking.Infrastructure.Repositories
             var query = _rooms.AsNoTracking().AsQueryable();
 
             ApplyRoomQueryFilters(roomFilter, ref query);
-            FilterRoomsByAvailability(from, to, ref query);
+            FilterRoomsByAvailability(from, to, null, ref query);
 
             return await query
                 .ToListAsync()
@@ -57,7 +57,7 @@ namespace RoomBooking.Infrastructure.Repositories
 
         public async Task<Room?> GetByIdAsync(Guid id)
         {
-            return await _rooms.Include(x=>x.Equipments)
+            return await _rooms.Include(x => x.Equipments)
                 .FirstOrDefaultAsync(r => r.Id == id)
                 .ConfigureAwait(false);
         }
@@ -76,8 +76,7 @@ namespace RoomBooking.Infrastructure.Repositories
                 .Include(r => r.Reservations)
                 .AsQueryable();
 
-            ExcludeReservationFromQuery(excludedReservationId, ref query);
-            FilterRoomsByAvailability(from, to, ref query);
+            FilterRoomsByAvailability(from, to, excludedReservationId, ref query);
 
             return await query.AnyAsync();
         }
@@ -91,10 +90,10 @@ namespace RoomBooking.Infrastructure.Repositories
             return true;
         }
 
-        private void FilterRoomsByAvailability(DateTime from, DateTime to, ref IQueryable<Room> roomQuery)
+        private void FilterRoomsByAvailability(DateTime from, DateTime to, Guid? excludedReservationId, ref IQueryable<Room> roomQuery)
         {
             roomQuery = roomQuery.Where(r => !r.Reservations.Any(reservation =>
-                (reservation.From < to && reservation.To > from)));
+                (reservation.Id != excludedReservationId) && (reservation.From < to && reservation.To > from)));
         }
 
         private void ApplyRoomQueryFilters(RoomFilters roomFilter, ref IQueryable<Room> roomsQuery)
@@ -113,14 +112,5 @@ namespace RoomBooking.Infrastructure.Repositories
             if (roomFilter.Equipments != null)
                 roomsQuery = roomsQuery.Where(r => r.Equipments.All(e => roomFilter.Equipments.Any(rfe => rfe.Name == e.Type.Name)));
         }
-
-        private void ExcludeReservationFromQuery(Guid? excludedReservationId, ref IQueryable<Room> query)
-        {
-            if (excludedReservationId.HasValue)
-            {
-                query = query.Where(r => !r.Reservations.Any(reservation => reservation.Id == excludedReservationId.Value));
-            }
-        }
-
     }
 }

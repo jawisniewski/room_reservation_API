@@ -7,6 +7,8 @@ using RoomBooking.Application.Interfaces.Services;
 using RoomBooking.Domain.Exceptions;
 using RoomBooking.Domain.Interfaces.Services;
 using RoomBooking.Domain.ValueObjects;
+using RoomBooking.Services.Interfaces.Repositories;
+using RoomsReservation.Domain.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +20,15 @@ namespace RoomBooking.Application.Services
     public class RoomAppService : IRoomAppService
     {
         private readonly IRoomService _roomService;
+        private readonly IRoomQueryRepository _roomRepository;
         private readonly ILogger<RoomAppService> _logger;
-        public RoomAppService(IRoomService roomService, ILogger<RoomAppService> logger)
+        private readonly IMapper _mapper;
+        public RoomAppService(IRoomService roomService, ILogger<RoomAppService> logger, IRoomQueryRepository roomRepository, IMapper mapper)
         {
             _roomService = roomService;
             _logger = logger;
+            _roomRepository = roomRepository;
+            _mapper = mapper;
         }
         public async Task<Result<Guid>> CreateAsync(BaseRoomRequest createRoomRequest)
         {
@@ -100,6 +106,23 @@ namespace RoomBooking.Application.Services
             {
                 _logger.LogError(ex, "An unexpected error occurred while deleting the room.");
                 return Result.Failure("An unexpected error occurred while deleting the room.", Enums.StatusCode.BadRequest);
+            }
+        }
+
+        public async Task<Result<IEnumerable<RoomResponse>>> GetAvailableRoomsAsync(DateTime from, DateTime to, RoomFilters roomFilter)
+        {
+            try
+            {
+                var rooms = await _roomRepository.GetAvailableRoomsAsync(from, to, roomFilter).ConfigureAwait(false);
+
+                var roomsDto =_mapper.Map<IEnumerable<RoomResponse>>(rooms);
+
+                return Result<IEnumerable<RoomResponse>>.Success(roomsDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching available rooms.");
+                return Result<IEnumerable<RoomResponse>>.Failure("An unexpected error occurred while fetching available rooms.", Enums.StatusCode.BadRequest);
             }
         }
     }
