@@ -15,6 +15,7 @@ namespace RoomBooking.Application.DI
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRoomAppService, RoomAppService>();
+            services.AddScoped<IReservationAppService, ReservationAppService>();
             return services;
         }
     }

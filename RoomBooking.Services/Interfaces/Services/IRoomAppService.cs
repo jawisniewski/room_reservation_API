@@ -39,5 +39,7 @@ namespace RoomBooking.Application.Interfaces.Services
         /// <param name="roomId">The unique identifier of the room to delete.</param>
         /// <returns>True if the deletion was successful; otherwise, false.</returns>
         Task<Result> DeleteAsync(Guid roomId);
+
+        Task<Result<IEnumerable<RoomResponse>>> GetAvailableRoomsAsync(DateTime from, DateTime to, RoomFilters roomFilter);
     }
 }

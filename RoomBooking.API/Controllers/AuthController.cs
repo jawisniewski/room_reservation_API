@@ -6,6 +6,8 @@ using RoomBooking.Application.Services;
 
 namespace RoomBooking.API.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;

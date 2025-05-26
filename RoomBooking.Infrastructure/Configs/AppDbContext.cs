@@ -39,18 +39,12 @@ namespace RoomBooking.Infrastructure.Configs
                     .IsRequired()
                     .HasMaxLength(300);
 
-                r.HasMany(r => r.Reservations)
-                    .WithOne(r => r.Room)
-                    .HasForeignKey(r => r.RoomId);
-
                 r.HasIndex(u => u.Name).IsUnique();
             });
 
             modelBuilder.Entity<Reservation>(r =>
             {
                 r.HasKey(r => r.Id);
-                r.Property(e => e.Id)
-                    .ValueGeneratedOnAdd();
 
                 r.Property(r => r.From)
                     .IsRequired();

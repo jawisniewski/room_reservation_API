@@ -17,7 +17,7 @@ namespace RoomBooking.Domain.Entitis.Room
         public int Capacity { get; private set; }
         public int TableCount { get; private set; }
         public RoomLayoutEnum Layout { get; private set; }
-        public virtual IEnumerable<Reservation> Reservations { get; private set; } = [];
+        public virtual List<Reservation> Reservations { get; private set; } = [];
         public virtual RoomReservationLimit? ReservationLimit { get; private set; }
         public  IEnumerable<Equipment> Equipments { get; private set; }
         private Room() { }

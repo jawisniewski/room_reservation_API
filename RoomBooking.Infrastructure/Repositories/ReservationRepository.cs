@@ -1,4 +1,6 @@
-﻿using RoomsReservation.Domain.Entitis;
+﻿using Microsoft.EntityFrameworkCore;
+using RoomBooking.Infrastructure.Configs;
+using RoomsReservation.Domain.Entitis;
 using RoomsReservation.Domain.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
@@ -10,29 +12,58 @@ namespace RoomBooking.Infrastructure.Repositories
 {
     public class ReservationRepository : IReservationRepository
     {
-        public Task<Guid> Create(Reservation reservation)
+        private readonly AppDbContext _context;
+        private readonly DbSet<Reservation> _reservations;
+        public ReservationRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _reservations = _context.Set<Reservation>();
+        }
+        public async Task<Guid> Create(Reservation reservation)
+        {
+            await _reservations.AddAsync(reservation);
+            await _context.SaveChangesAsync();
+
+            return reservation.Id;
         }
 
-        public Task<bool> Delete(Guid roomId)
+        public async Task<bool> Delete(Guid roomId)
         {
-            throw new NotImplementedException();
+            var reservation = await _reservations.FirstOrDefaultAsync(r => r.Id == roomId).ConfigureAwait(false);
+
+            if (reservation == null)
+                return false;
+
+            _reservations.Remove(reservation);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public Task<Reservation?> GetById(Guid id)
         {
-            throw new NotImplementedException();
+            return _reservations
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<bool> Update(Reservation reservation)
+        public async Task<bool> Update(Reservation reservation)
         {
-            throw new NotImplementedException();
+            if (reservation.Id == Guid.Empty)
+                return false;
+
+            _reservations.Update(reservation);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public Task<bool> UserHasReservation(Guid userId, DateTime from, DateTime to, Guid? excludedReservationId)
         {
-            throw new NotImplementedException();
+            return _reservations
+                .AnyAsync(r => r.UserId == userId &&
+                               r.From < to &&
+                               r.To > from &&
+                               r.Id != excludedReservationId);
         }
     }
 }
