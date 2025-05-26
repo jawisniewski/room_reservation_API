@@ -28,7 +28,11 @@ namespace RoomBooking.Infrastructure.Configs
 
                 r.OwnsMany(r => r.Equipments, eq =>
                     {
-                        eq.OwnsOne(eq => eq.Type);
+                        eq.WithOwner()
+                            .HasForeignKey("RoomId");   
+                        eq.OwnsOne(eq => eq.Type); 
+                        eq.Property<Guid>("Id");
+                        eq.HasKey("Id");
                     });
                 r.OwnsOne(b => b.ReservationLimit);
                 r.Property(r => r.Name)

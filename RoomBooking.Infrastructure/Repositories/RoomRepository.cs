@@ -57,7 +57,7 @@ namespace RoomBooking.Infrastructure.Repositories
 
         public async Task<Room?> GetByIdAsync(Guid id)
         {
-            return await _rooms.Include(x=>x.Equipments).AsNoTracking()
+            return await _rooms.Include(x=>x.Equipments)
                 .FirstOrDefaultAsync(r => r.Id == id)
                 .ConfigureAwait(false);
         }
