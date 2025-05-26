@@ -100,46 +100,43 @@ namespace RoomBooking.Infrastructure.Migrations
                 {
                     b.OwnsMany("RoomBooking.Domain.ValueObjects.Equipment", "Equipments", b1 =>
                         {
-                            b1.Property<Guid>("RoomId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
+                            b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<int>("Quantity")
                                 .HasColumnType("int");
 
-                            b1.HasKey("RoomId", "Id");
+                            b1.Property<Guid>("RoomId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RoomId");
 
                             b1.ToTable("Equipment");
 
                             b1.WithOwner()
                                 .HasForeignKey("RoomId");
 
-                            b1.OwnsOne("RoomBooking.Domain.ValueObjects.EquipmentType", "Name", b2 =>
+                            b1.OwnsOne("RoomBooking.Domain.ValueObjects.EquipmentType", "Type", b2 =>
                                 {
-                                    b2.Property<Guid>("EquipmentRoomId")
+                                    b2.Property<Guid>("EquipmentId")
                                         .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("EquipmentId")
-                                        .HasColumnType("int");
 
                                     b2.Property<string>("Name")
                                         .IsRequired()
                                         .HasColumnType("nvarchar(max)");
 
-                                    b2.HasKey("EquipmentRoomId", "EquipmentId");
+                                    b2.HasKey("EquipmentId");
 
                                     b2.ToTable("Equipment");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("EquipmentRoomId", "EquipmentId");
+                                        .HasForeignKey("EquipmentId");
                                 });
 
-                            b1.Navigation("Name")
+                            b1.Navigation("Type")
                                 .IsRequired();
                         });
 

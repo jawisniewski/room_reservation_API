@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RoomBooking.Services.DTOs
+namespace RoomBooking.Application.DTOs.Room
 {
-    public class RoomFilters
+    public class UpdateRoomRequest : BaseRoomRequest
     {
+        public Guid Id { get; set; }
     }
 }

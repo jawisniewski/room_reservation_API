@@ -45,15 +45,14 @@ namespace RoomBooking.Infrastructure.Migrations
                 name: "Equipment",
                 columns: table => new
                 {
-                    RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipment", x => new { x.RoomId, x.Id });
+                    table.PrimaryKey("PK_Equipment", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Equipment_Rooms_RoomId",
                         column: x => x.RoomId,
@@ -88,6 +87,11 @@ namespace RoomBooking.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Equipment_RoomId",
+                table: "Equipment",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_RoomId",

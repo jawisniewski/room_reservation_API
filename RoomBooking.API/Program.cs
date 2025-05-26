@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using RoomBooking.API.Options;
 using RoomBooking.Application.DI;
 using RoomBooking.Application.Options;
 using RoomBooking.Domain.DI;
@@ -25,9 +27,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<JwtOptions>(
 builder.Configuration.GetSection("Auth"));
+builder.Services.ConfigureOptions<JwtBrearerOptionsSetup>();
 builder.Services.AddInfrastracture(connectionString);
 builder.Services.AddApplication();
 builder.Services.AddDomain();
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
+builder.Services.AddAuthorization();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "¯ycie s³upka API", Version = "v1" });
@@ -71,6 +79,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

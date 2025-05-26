@@ -29,7 +29,7 @@ namespace RoomBooking.Domain.Services
 
             room.IsReservationWithinLimits(from, to);
 
-            var isAvailable = await _roomRepository.IsAvailableAsync(roomId, from, to);
+            var isAvailable = await _roomRepository.IsAvailableAsync(room.Id, from, to);
 
             if (!isAvailable)
             {
@@ -43,7 +43,7 @@ namespace RoomBooking.Domain.Services
                 throw new DomainException("User already has a reservation during this time");
             }
 
-            var reservation = new Reservation(from, to, roomId, userId);
+            var reservation = new Reservation(from, to, room.Id, userId);
 
             var result = await _reservationRepository.Create(reservation);
 

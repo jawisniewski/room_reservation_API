@@ -10,7 +10,7 @@ namespace RoomBooking.Domain.ValueObjects
 {
     public class Equipment : ValueObject
     {
-        public EquipmentType Name { get; private set; }
+        public EquipmentType Type { get; private set; }
         public int Quantity { get; private set; }
 
         private Equipment() { }
@@ -19,7 +19,7 @@ namespace RoomBooking.Domain.ValueObjects
         {
             ValidateQuantity(quantity);
 
-            Name = name;
+            Type = name;
             Quantity = quantity;
         }
        
@@ -31,7 +31,7 @@ namespace RoomBooking.Domain.ValueObjects
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return Name;
+            yield return Type;
             yield return Quantity;
         }
     }
